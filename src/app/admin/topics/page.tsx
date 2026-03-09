@@ -55,7 +55,7 @@ export default function AdminTopicsPage() {
   // Fetch topics
   useEffect(() => {
     fetchTopics();
-  }, []););
+  }, []);
 
   const fetchTopics = async () => {
     try {
