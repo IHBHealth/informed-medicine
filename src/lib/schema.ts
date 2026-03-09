@@ -66,11 +66,6 @@ export const newsroom_settings = newsroomSettings;
 export const newsroom_articles = newsroomArticles;
 export const newsroom_generation_log = newsroomGenerationLog;
 
-// Snake_case aliases (used by API routes)
-export const newsroom_topics = newsroomTopics;
-export const newsroom_settings = newsroomSettings;
-export const newsroom_articles = newsroomArticles;
-export const newsroom_generation_log = newsroomGenerationLog;
 // Type exports
 export type NewsroomTopic = typeof newsroomTopics.$inferSelect;
 export type NewNewsroomTopic = typeof newsroomTopics.$inferInsert;
