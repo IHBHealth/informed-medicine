@@ -4,7 +4,7 @@ import labTestsData from "@/data/lab-tests.json";
 import supplementsData from "@/data/supplements.json";
 import articlesData from "@/data/articles.json";
 import { db } from "@/lib/db";
-import { newsroomArticles } from "@/lib/schema";
+import { newsroomArticles, fdaDrugs } from "@/lib/schema";
 import { eq, desc } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +12,33 @@ export const dynamic = "force-dynamic";
 const SITE_URL = "https://informedmedicine.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const drugs = drugsData.map((drug: any) => ({
+  // Static drugs from JSON (fallback)
+  const staticDrugs = drugsData.map((drug: any) => ({
     url: `${SITE_URL}/drugs/${drug.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
+
+  // Try to get all drugs from DB (much larger set)
+  let dbDrugs: MetadataRoute.Sitemap = [];
+  try {
+    const allDrugs = await db
+      .select({ slug: fdaDrugs.slug, lastSyncedAt: fdaDrugs.lastSyncedAt })
+      .from(fdaDrugs);
+
+    dbDrugs = allDrugs.map((drug) => ({
+      url: `${SITE_URL}/drugs/${drug.slug}`,
+      lastModified: drug.lastSyncedAt || new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    // DB unavailable — use static drugs only
+  }
+
+  // Use DB drugs if available, otherwise static
+  const drugs = dbDrugs.length > 0 ? dbDrugs : staticDrugs;
 
   const labTests = labTestsData.map((test: any) => ({
     url: `${SITE_URL}/lab-tests/${test.slug}`,
@@ -40,12 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  let dbArticles: any[] = [];
+  let dbArticles: MetadataRoute.Sitemap = [];
   try {
     const publishedArticles = await db
       .select()
       .from(newsroomArticles)
-      .where(eq(newsroomArticles.status, 'published'))
+      .where(eq(newsroomArticles.status, "published"))
       .orderBy(desc(newsroomArticles.publishedAt));
 
     dbArticles = publishedArticles.map((article: any) => ({
@@ -54,8 +75,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.9,
     }));
-  } catch (error) {
-    console.warn("Failed to fetch articles from database, using static data only:", error);
+  } catch {
+    // DB unavailable
   }
 
   return [

@@ -66,6 +66,39 @@ export const newsroom_settings = newsroomSettings;
 export const newsroom_articles = newsroomArticles;
 export const newsroom_generation_log = newsroomGenerationLog;
 
+// ── FDA Drug Database ──
+
+export const fdaDrugs = pgTable("fda_drugs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  genericName: text("generic_name").notNull(),
+  slug: text("slug").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  brandNames: jsonb("brand_names").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+  drugClass: text("drug_class"),
+  setId: text("set_id"),
+  description: text("description"),
+  prescriptionRequired: boolean("prescription_required"),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  curatedData: jsonb("curated_data").$type<CuratedDrugData | null>(),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export interface CuratedDrugData {
+  description: string;
+  uses: string;
+  dosage: string;
+  sideEffects: string;
+  warnings: string;
+  interactions: string;
+  pregnancy: string | null;
+  storage: string | null;
+  schedule: string | null;
+  views: number;
+}
+
+export const fda_drugs = fdaDrugs;
+
 // Type exports
 export type NewsroomTopic = typeof newsroomTopics.$inferSelect;
 export type NewNewsroomTopic = typeof newsroomTopics.$inferInsert;
@@ -73,3 +106,5 @@ export type NewsroomSettings = typeof newsroomSettings.$inferSelect;
 export type NewsroomArticle = typeof newsroomArticles.$inferSelect;
 export type NewNewsroomArticle = typeof newsroomArticles.$inferInsert;
 export type GenerationLog = typeof newsroomGenerationLog.$inferSelect;
+export type FdaDrug = typeof fdaDrugs.$inferSelect;
+export type NewFdaDrug = typeof fdaDrugs.$inferInsert;
