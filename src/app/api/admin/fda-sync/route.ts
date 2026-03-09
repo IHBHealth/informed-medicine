@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { fetchDrugCountsByLetter, fetchLatestLabel, labelToDrugFields, slugify, titleCase, sleep } from '@/lib/openfda';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   // Verify with CRON_SECRET header or admin auth
@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const letter = (searchParams.get('letter') || 'A').toUpperCase();
+  const skip = parseInt(searchParams.get('skip') || '0');
+  const limit = parseInt(searchParams.get('limit') || '1000');
 
   if (!/^[A-Z]$/.test(letter)) {
     return NextResponse.json({ error: 'Invalid letter parameter' }, { status: 400 });
@@ -25,24 +27,56 @@ export async function POST(request: NextRequest) {
 
   let drugsFound = 0;
   let drugsUpserted = 0;
+  let drugsSkipped = 0;
   let errors = 0;
+  const startTime = Date.now();
 
   try {
-    // Get all unique generic names starting with this letter
-    const counts = await fetchDrugCountsByLetter(letter);
-    drugsFound = counts.length;
+    // Get all unique generic names starting with this letter (up to 1000 from openFDA count API)
+    const allCounts = await fetchDrugCountsByLetter(letter);
+    drugsFound = allCounts.length;
+
+    // Apply skip/limit for pagination
+    const counts = allCounts.slice(skip, skip + limit);
 
     // Process in batches of 5 with delays to respect rate limits
     for (let i = 0; i < counts.length; i += 5) {
+      // Safety: stop if we're approaching the timeout (leave 15s buffer)
+      if (Date.now() - startTime > 270_000) {
+        return NextResponse.json({
+          letter,
+          drugsFound,
+          drugsUpserted,
+          drugsSkipped,
+          errors,
+          timedOut: true,
+          resumeAt: skip + i,
+          message: `Timed out after processing ${i} drugs. Resume with ?letter=${letter}&skip=${skip + i}`,
+        });
+      }
+
       const batch = counts.slice(i, i + 5);
 
       await Promise.all(batch.map(async ({ term }) => {
         try {
-          const label = await fetchLatestLabel(term);
-          if (!label) return;
-
           const slug = slugify(term);
           if (!slug) return;
+
+          // Skip drugs that already have curated_data (unless force refresh)
+          if (!searchParams.has('force')) {
+            const existing = await db.select({ id: fdaDrugs.id, curatedData: fdaDrugs.curatedData, isFeatured: fdaDrugs.isFeatured })
+              .from(fdaDrugs)
+              .where(eq(fdaDrugs.slug, slug))
+              .limit(1);
+
+            if (existing.length > 0 && (existing[0].curatedData || existing[0].isFeatured)) {
+              drugsSkipped++;
+              return;
+            }
+          }
+
+          const label = await fetchLatestLabel(term);
+          if (!label) return;
 
           const brandNames = label.openfda?.brand_name?.map(b => titleCase(b)) || [];
           const drugClass = label.openfda?.pharm_class_epc?.[0] || null;
@@ -69,7 +103,7 @@ export async function POST(request: NextRequest) {
           // Short description for the listing page
           const shortDesc = (fields.description || fields.uses || '').substring(0, 500);
 
-          // Check if a curated (featured) entry exists - don't overwrite those
+          // Check if entry exists
           const existing = await db.select({ id: fdaDrugs.id, isFeatured: fdaDrugs.isFeatured })
             .from(fdaDrugs)
             .where(eq(fdaDrugs.slug, slug))
@@ -116,14 +150,14 @@ export async function POST(request: NextRequest) {
         }
       }));
 
-      // Rate limit: wait 350ms between batches
+      // Rate limit: wait 200ms between batches
       if (i + 5 < counts.length) {
-        await sleep(350);
+        await sleep(200);
       }
     }
   } catch (e: any) {
-    return NextResponse.json({ error: e.message, letter, drugsFound, drugsUpserted, errors }, { status: 500 });
+    return NextResponse.json({ error: e.message, letter, drugsFound, drugsUpserted, drugsSkipped, errors }, { status: 500 });
   }
 
-  return NextResponse.json({ letter, drugsFound, drugsUpserted, errors });
+  return NextResponse.json({ letter, drugsFound, drugsUpserted, drugsSkipped, errors, timedOut: false });
 }
