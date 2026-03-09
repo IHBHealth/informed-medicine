@@ -60,7 +60,7 @@ async function fetchJson<T>(url: string): Promise<T> {
 }
 
 export async function fetchDrugCountsByLetter(letter: string): Promise<OpenFDACountResult[]> {
-  const url = `${OPENFDA_BASE}?search=openfda.generic_name:${letter}*&count=openfda.generic_name.exact${apiKeyParam()}`;
+  const url = `${OPENFDA_BASE}?search=openfda.generic_name:${letter}*&count=openfda.generic_name.exact&limit=1000${apiKeyParam()}`;
   try {
     const data = await fetchJson<{ results: OpenFDACountResult[] }>(url);
     return data.results || [];
