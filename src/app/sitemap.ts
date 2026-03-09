@@ -7,6 +7,8 @@ import { db } from "@/lib/db";
 import { newsroomArticles } from "@/lib/schema";
 import { eq, desc } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 const SITE_URL = "https://informedmedicine.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

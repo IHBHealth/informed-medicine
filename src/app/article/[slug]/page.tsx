@@ -9,6 +9,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import JsonLd from "@/components/JsonLd";
 import { SITE_NAME, SITE_URL, categoryLabel, CATEGORY_COLORS, cn, formatDate, formatNumber } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: { slug: string };
 }

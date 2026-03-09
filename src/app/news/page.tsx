@@ -18,8 +18,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/news` },
 };
 
-// Revalidate every 60 seconds to pick up new articles
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function NewsPage() {
   let articles: any[] = [];
