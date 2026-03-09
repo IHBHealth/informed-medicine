@@ -116,8 +116,6 @@ export async function PUT(
     if (featured !== undefined) updates.featured = featured;
     if (faqData !== undefined) updates.faqData = faqData;
 
-    updates.updatedAt = new Date();
-
     const result = await db
       .update(newsroom_articles)
       .set(updates)

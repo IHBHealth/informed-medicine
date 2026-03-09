@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
         articlesPerDay: 4,
         generateImages: true,
         autoPublish: false,
-        createdAt: new Date(),
         updatedAt: new Date(),
       };
 

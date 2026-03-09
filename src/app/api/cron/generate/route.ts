@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       .from(newsroom_generation_log)
       .where(
         and(
-          sql`DATE(${newsroom_generation_log.generatedAt}) = DATE(${sql.raw(
+          sql`DATE(${newsroom_generation_log.createdAt}) = DATE(${sql.raw(
             "'" + today.toISOString().split('T')[0] + "'"
           )})`,
         )
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         let imageUrl = null;
         if (setting.generateImages) {
           try {
-            imageUrl = await generateAndUploadImage(topic.name);
+            imageUrl = await generateAndUploadImage(topic.name, topic.slug);
           } catch (imageError) {
             console.error('Image generation failed:', imageError);
             // Continue without image
@@ -123,30 +123,29 @@ export async function POST(request: NextRequest) {
         const publishedAt = setting.autoPublish ? new Date() : null;
 
         // Save article
-        const slug = slugify(generatedArticle.title);
-        const readTime = calculateReadTime(generatedArticle.content);
+        const slug = slugify(generatedArticle.article.title);
+        const readTime = calculateReadTime(generatedArticle.article.content);
 
         const article = await db
           .insert(newsroom_articles)
           .values({
-            title: generatedArticle.title,
+            title: generatedArticle.article.title,
             slug,
-            content: generatedArticle.content,
-            category: topic.category || null,
-            section: null,
+            summary: generatedArticle.article.summary || generatedArticle.article.content.substring(0, 200),
+            content: generatedArticle.article.content,
+            category: topic.category || 'general',
+            section: 'news',
             author: 'AI Generated',
             status,
             imageUrl: imageUrl || null,
-            seoTitle: generatedArticle.title,
-            seoDescription: generatedArticle.content.substring(0, 160),
+            seoTitle: generatedArticle.article.title,
+            seoDescription: generatedArticle.article.content.substring(0, 160),
             featured: false,
             faqData: null,
             readTime,
             views: 0,
             publishedAt,
             generatedAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
           })
           .returning();
 
@@ -154,9 +153,10 @@ export async function POST(request: NextRequest) {
         await db.insert(newsroom_generation_log).values({
           topicId: topic.id,
           articleId: article[0].id,
+          status: 'success',
           tokensUsed: generatedArticle.tokensUsed || 0,
-          estimatedCost: generatedArticle.estimatedCost || 0,
-          generatedAt: new Date(),
+          costEstimate: '0.00',
+          imageGenerated: !!imageUrl,
         });
 
         generatedArticles.push(article[0]);

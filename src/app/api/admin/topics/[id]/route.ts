@@ -36,8 +36,6 @@ export async function PUT(
     if (active !== undefined) updates.active = active;
     if (priority !== undefined) updates.priority = priority;
 
-    updates.updatedAt = new Date();
-
     const result = await db
       .update(newsroom_topics)
       .set(updates)
@@ -81,7 +79,7 @@ export async function DELETE(
 
     const result = await db
       .update(newsroom_topics)
-      .set({ active: false, updatedAt: new Date() })
+      .set({ active: false })
       .where(eq(newsroom_topics.id, id))
       .returning();
 

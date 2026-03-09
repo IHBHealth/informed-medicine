@@ -63,8 +63,7 @@ export async function POST(request: NextRequest) {
         category: category || null,
         active,
         priority,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+
       })
       .returning();
 

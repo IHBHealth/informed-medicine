@@ -43,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const publishedArticles = await db
       .select()
       .from(newsroomArticles)
-      .where(eq(newsroomArticles.published, true))
+      .where(eq(newsroomArticles.status, 'published'))
       .orderBy(desc(newsroomArticles.publishedAt));
 
     dbArticles = publishedArticles.map((article: any) => ({

@@ -40,7 +40,6 @@ export async function GET(
       .update(newsroom_articles)
       .set({
         views: sql`${newsroom_articles.views} + 1`,
-        updatedAt: new Date(),
       })
       .where(eq(newsroom_articles.id, article.id));
 
