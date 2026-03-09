@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   try {
     // Check auth
     const apiKeyValid = await verifyApiKey(request);
-    const sessionValid = isAuthenticated(request);
+    const sessionValid = await isAuthenticated();
 
     if (!apiKeyValid && !sessionValid) {
       return NextResponse.json(
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   try {
     // Check auth
     const apiKeyValid = await verifyApiKey(request);
-    const sessionValid = isAuthenticated(request);
+    const sessionValid = await isAuthenticated();
 
     if (!apiKeyValid && !sessionValid) {
       return NextResponse.json(

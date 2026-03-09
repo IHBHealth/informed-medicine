@@ -16,7 +16,7 @@ export async function GET(
   try {
     // Check auth
     const apiKeyValid = await verifyApiKey(request);
-    const sessionValid = isAuthenticated(request);
+    const sessionValid = await isAuthenticated();
 
     if (!apiKeyValid && !sessionValid) {
       return NextResponse.json(
@@ -56,7 +56,7 @@ export async function PUT(
   try {
     // Check auth
     const apiKeyValid = await verifyApiKey(request);
-    const sessionValid = isAuthenticated(request);
+    const sessionValid = await isAuthenticated();
 
     if (!apiKeyValid && !sessionValid) {
       return NextResponse.json(
@@ -141,7 +141,7 @@ export async function DELETE(
   try {
     // Check auth
     const apiKeyValid = await verifyApiKey(request);
-    const sessionValid = isAuthenticated(request);
+    const sessionValid = await isAuthenticated();
 
     if (!apiKeyValid && !sessionValid) {
       return NextResponse.json(
