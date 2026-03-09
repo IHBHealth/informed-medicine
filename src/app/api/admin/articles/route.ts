@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    let query = db.select().from(newsroom_articles);
+    let query = db.select().from(newsroom_articles).$dynamic();
 
     if (status) {
-      query = query.where(eq(newsroom_articles.status, status));
+      query = query.where(eq(newsroom_articles.status, status as any));
     }
 
     const offset = (page - 1) * limit;
@@ -103,10 +103,11 @@ export async function POST(request: NextRequest) {
       .values({
         title,
         slug,
+        summary: content.substring(0, 200),
         content,
-        category: category || null,
-        section: section || null,
-        author: author || null,
+        category: category || 'general',
+        section: section || 'news',
+        author: author || 'InformedMedicine AI Newsroom',
         status,
         imageUrl: imageUrl || null,
         seoTitle: finalSeoTitle,
@@ -117,8 +118,6 @@ export async function POST(request: NextRequest) {
         views: 0,
         publishedAt,
         generatedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
       })
       .returning();
 
