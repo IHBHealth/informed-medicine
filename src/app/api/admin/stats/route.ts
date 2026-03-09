@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       .from(newsroom_generation_log)
       .where(
         and(
-          sql`DATE(${newsroom_generation_log.generatedAt}) = DATE(${sql.raw(
+          sql`DATE(${newsroom_generation_log.createdAt}) = DATE(${sql.raw(
             "'" + today.toISOString().split('T')[0] + "'"
           )})`,
         )
@@ -66,14 +66,14 @@ export async function GET(request: NextRequest) {
         tokensUsed: sql`sum(${newsroom_generation_log.tokensUsed})`.mapWith(
           Number
         ),
-        estimatedCost: sql`sum(${newsroom_generation_log.estimatedCost})`.mapWith(
+        estimatedCost: sql`sum(${newsroom_generation_log.costEstimate})`.mapWith(
           Number
         ),
       })
       .from(newsroom_generation_log)
       .where(
         and(
-          sql`DATE(${newsroom_generation_log.generatedAt}) = DATE(${sql.raw(
+          sql`DATE(${newsroom_generation_log.createdAt}) = DATE(${sql.raw(
             "'" + today.toISOString().split('T')[0] + "'"
           )})`,
         )
@@ -85,14 +85,14 @@ export async function GET(request: NextRequest) {
     // Weekly cost
     const weekStats = await db
       .select({
-        estimatedCost: sql`sum(${newsroom_generation_log.estimatedCost})`.mapWith(
+        estimatedCost: sql`sum(${newsroom_generation_log.costEstimate})`.mapWith(
           Number
         ),
       })
       .from(newsroom_generation_log)
       .where(
         and(
-          sql`DATE(${newsroom_generation_log.generatedAt}) >= DATE(${sql.raw(
+          sql`DATE(${newsroom_generation_log.createdAt}) >= DATE(${sql.raw(
             "'" + weekAgo.toISOString().split('T')[0] + "'"
           )})`,
         )
@@ -103,14 +103,14 @@ export async function GET(request: NextRequest) {
     // Monthly cost
     const monthStats = await db
       .select({
-        estimatedCost: sql`sum(${newsroom_generation_log.estimatedCost})`.mapWith(
+        estimatedCost: sql`sum(${newsroom_generation_log.costEstimate})`.mapWith(
           Number
         ),
       })
       .from(newsroom_generation_log)
       .where(
         and(
-          sql`DATE(${newsroom_generation_log.generatedAt}) >= DATE(${sql.raw(
+          sql`DATE(${newsroom_generation_log.createdAt}) >= DATE(${sql.raw(
             "'" + monthAgo.toISOString().split('T')[0] + "'"
           )})`,
         )
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     const recentLogs = await db
       .select()
       .from(newsroom_generation_log)
-      .orderBy(desc(newsroom_generation_log.generatedAt))
+      .orderBy(desc(newsroom_generation_log.createdAt))
       .limit(10);
 
     return NextResponse.json({
