@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { fdaDrugs } from '@/lib/schema';
+import type { CuratedDrugData } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
-import { fetchDrugCountsByLetter, fetchLatestLabel, slugify, titleCase, sleep } from '@/lib/openfda';
+import { fetchDrugCountsByLetter, fetchLatestLabel, labelToDrugFields, slugify, titleCase, sleep } from '@/lib/openfda';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -48,9 +49,25 @@ export async function POST(request: NextRequest) {
           const productType = label.openfda?.product_type?.[0] || '';
           const isPrescription = productType.includes('Prescription');
 
-          // Short description from the label
-          const rawDesc = label.description?.[0] || label.indications_and_usage?.[0] || '';
-          const description = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().substring(0, 500);
+          // Extract ALL structured fields from the FDA label
+          const fields = labelToDrugFields(label);
+
+          // Build the structured data object to store in curated_data
+          const structuredData: CuratedDrugData = {
+            description: fields.description,
+            uses: fields.uses,
+            dosage: fields.dosage,
+            sideEffects: fields.sideEffects,
+            warnings: fields.warnings,
+            interactions: fields.interactions,
+            pregnancy: fields.pregnancy,
+            storage: fields.storage,
+            schedule: null,
+            views: 0,
+          };
+
+          // Short description for the listing page
+          const shortDesc = (fields.description || fields.uses || '').substring(0, 500);
 
           // Check if a curated (featured) entry exists - don't overwrite those
           const existing = await db.select({ id: fdaDrugs.id, isFeatured: fdaDrugs.isFeatured })
@@ -59,25 +76,26 @@ export async function POST(request: NextRequest) {
             .limit(1);
 
           if (existing.length > 0 && existing[0].isFeatured) {
-            // Update only setId and brandNames for curated drugs, keep their content
+            // Update only setId and brandNames for hand-curated drugs, keep their content
             await db.update(fdaDrugs)
               .set({ setId: label.set_id, brandNames, lastSyncedAt: new Date() })
               .where(eq(fdaDrugs.slug, slug));
           } else if (existing.length > 0) {
-            // Update existing openFDA entry
+            // Update existing openFDA entry with full structured data
             await db.update(fdaDrugs)
               .set({
                 displayName: titleCase(term),
                 brandNames,
                 drugClass,
                 setId: label.set_id,
-                description,
+                description: shortDesc,
                 prescriptionRequired: isPrescription,
+                curatedData: structuredData,
                 lastSyncedAt: new Date(),
               })
               .where(eq(fdaDrugs.slug, slug));
           } else {
-            // Insert new drug
+            // Insert new drug with full structured data
             await db.insert(fdaDrugs).values({
               genericName: term.toLowerCase(),
               slug,
@@ -85,9 +103,10 @@ export async function POST(request: NextRequest) {
               brandNames,
               drugClass,
               setId: label.set_id,
-              description,
+              description: shortDesc,
               prescriptionRequired: isPrescription,
               isFeatured: false,
+              curatedData: structuredData,
               lastSyncedAt: new Date(),
             });
           }
