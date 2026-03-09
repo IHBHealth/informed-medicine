@@ -8,6 +8,7 @@ import { Clock, Eye, ArrowLeft, Calendar, User } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import JsonLd from "@/components/JsonLd";
 import { SITE_NAME, SITE_URL, categoryLabel, CATEGORY_COLORS, cn, formatDate, formatNumber } from "@/lib/utils";
+import staticArticles from "@/data/articles.json";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,31 @@ interface Props {
 }
 
 async function getArticle(slug: string) {
-  const articles = await db
-    .select()
-    .from(newsroomArticles)
-    .where(and(eq(newsroomArticles.slug, slug), eq(newsroomArticles.status, "published")));
-  return articles[0] || null;
+  // Try database first
+  try {
+    const articles = await db
+      .select()
+      .from(newsroomArticles)
+      .where(and(eq(newsroomArticles.slug, slug), eq(newsroomArticles.status, "published")));
+    if (articles[0]) return articles[0];
+  } catch {
+    // DB unavailable — fall through to static data
+  }
+
+  // Fall back to static articles
+  const staticMatch = staticArticles.find((a: any) => a.slug === slug);
+  if (staticMatch) {
+    return {
+      ...staticMatch,
+      status: "published" as const,
+      publishedAt: staticMatch.publishedAt ? new Date(staticMatch.publishedAt) : null,
+      seoTitle: null,
+      seoDescription: null,
+      faqData: null,
+    };
+  }
+
+  return null;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -58,12 +79,14 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticle(params.slug);
   if (!article) notFound();
 
-  // Increment views (fire and forget)
-  db.update(newsroomArticles)
-    .set({ views: article.views + 1 })
-    .where(eq(newsroomArticles.id, article.id))
-    .execute()
-    .catch(() => {});
+  // Increment views (fire and forget, safe if DB unavailable)
+  try {
+    db.update(newsroomArticles)
+      .set({ views: (article.views || 0) + 1 })
+      .where(eq(newsroomArticles.id, article.id))
+      .execute()
+      .catch(() => {});
+  } catch {}
 
   const faqs = (article.faqData as Array<{question: string; answer: string}>) || [];
 
