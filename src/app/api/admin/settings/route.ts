@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { newsroom_settings } from '@/lib/schema';
 import { verifyApiKey, isAuthenticated } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check auth

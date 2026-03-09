@@ -7,6 +7,8 @@ import {
 import { verifyApiKey, isAuthenticated } from '@/lib/auth';
 import { eq, desc, sql, and } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check auth

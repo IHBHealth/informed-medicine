@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { newsroom_articles } from '@/lib/schema';
 import { eq, sql } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string } }

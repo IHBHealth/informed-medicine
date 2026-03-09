@@ -11,6 +11,8 @@ import { eq } from 'drizzle-orm';
 import { generateArticle } from '@/lib/ai-generator';
 import { generateAndUploadImage } from '@/lib/image-generator';
 
+export const dynamic = 'force-dynamic';
+
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 

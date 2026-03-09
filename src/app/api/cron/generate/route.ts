@@ -11,6 +11,8 @@ import { generateArticle } from '@/lib/ai-generator';
 import { generateAndUploadImage } from '@/lib/image-generator';
 import { verifyCronSecret } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 

@@ -4,6 +4,8 @@ import { newsroom_articles } from '@/lib/schema';
 import { verifyApiKey, isAuthenticated } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 const calculateReadTime = (content: string): number => {
   const wordCount = content.split(/\s+/).length;
   return Math.ceil(wordCount / 200);

@@ -22,12 +22,17 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function NewsPage() {
-  const articles = await db
-    .select()
-    .from(newsroomArticles)
-    .where(eq(newsroomArticles.status, "published"))
-    .orderBy(desc(newsroomArticles.publishedAt))
-    .limit(50);
+  let articles: any[] = [];
+  try {
+    articles = await db
+      .select()
+      .from(newsroomArticles)
+      .where(eq(newsroomArticles.status, "published"))
+      .orderBy(desc(newsroomArticles.publishedAt))
+      .limit(50);
+  } catch {
+    // Table may not exist yet — fall back to static data
+  }
 
   // Also try to load static articles for fallback
   let staticArticles: any[] = [];

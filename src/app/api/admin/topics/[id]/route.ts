@@ -4,6 +4,8 @@ import { newsroom_topics } from '@/lib/schema';
 import { verifyApiKey, isAuthenticated } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
