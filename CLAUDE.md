@@ -107,6 +107,13 @@ ADMIN_API_KEY         # API auth for agents
 CRON_SECRET           # Vercel cron job auth
 ```
 
+## Design Priorities (IMPORTANT)
+1. **SEO optimization is critical** — This is a health information site that needs to rank well in search engines. Every page should have proper meta tags, structured data (JSON-LD), semantic HTML, Open Graph tags, and clean URLs. Use Next.js metadata API and generateMetadata for dynamic pages.
+2. **Speed above all** — Pages must load fast. Use static generation (SSG) and ISR wherever possible. Minimize client-side JavaScript. Avoid heavy dependencies. Optimize images. Keep bundle sizes small.
+3. **Mobile-first design** — Most users will be on phones. Design for mobile first, then scale up. Touch-friendly tap targets, readable text without zooming, fast load on cellular networks.
+4. **Simple, clean code** — Keep components small and readable. Avoid over-engineering. Prefer fewer files with clear purpose over complex abstractions. If a simpler approach works, use it.
+5. **Simple, clean UI** — Minimal, trustworthy design appropriate for health information. No clutter. Clear typography. Easy to scan and read.
+
 ## Important Notes
 - 10 drugs are hand-curated (`is_featured = true`) — sync skips these
 - The openFDA count API returns max 1,000 unique drug names per letter
