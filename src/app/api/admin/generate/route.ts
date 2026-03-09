@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     let imageUrl = null;
     if (setting.generateImages) {
-      imageUrl = await generateAndUploadImage(topic.name);
+      imageUrl = await generateAndUploadImage(topic.name, article.slug);
     }
 
     // Determine status
