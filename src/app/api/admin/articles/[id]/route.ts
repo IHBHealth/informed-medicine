@@ -154,7 +154,7 @@ export async function DELETE(
 
     const result = await db
       .update(newsroom_articles)
-      .set({ status: 'archived', updatedAt: new Date() })
+      .set({ status: 'archived' })
       .where(eq(newsroom_articles.id, id))
       .returning();
 
