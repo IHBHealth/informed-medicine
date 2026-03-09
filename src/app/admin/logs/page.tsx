@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, AlertCircle, SkipCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, StopCircle } from 'lucide-react';
 
 type LogStatus = 'success' | 'failed' | 'skipped';
 
@@ -53,7 +53,7 @@ export default function AdminLogsPage() {
       case 'failed':
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'skipped':
-        return <SkipCircle className="w-5 h-5 text-yellow-500" />;
+        return <StopCircle className="w-5 h-5 text-yellow-500" />;
     }
   };
 
