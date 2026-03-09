@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
         // Generate article
         const generatedArticle = await generateArticle(
           topic.name,
-          topic.promptTemplate,
-          topic.category
+          topic.category,
+          topic.promptTemplate
         );
 
         let imageUrl = null;

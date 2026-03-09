@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build combined where clause
-    let query = db.select().from(newsroom_articles);
+    let query = db.select().from(newsroom_articles).$dynamic();
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));

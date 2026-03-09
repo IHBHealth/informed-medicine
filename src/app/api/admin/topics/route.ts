@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         name,
         slug: finalSlug,
         promptTemplate: finalTemplate,
-        category: category || null,
+        category: category || 'general',
         active,
         priority,
 
