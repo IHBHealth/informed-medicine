@@ -107,12 +107,7 @@ export default function AdvicePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {displayArticles.map((article) => {
-            const colors = CATEGORY_COLORS[article.category] || {
-              bg: "bg-gray-100",
-              text: "text-gray-700",
-              darkBg: "dark:bg-gray-900/30",
-              darkText: "dark:text-gray-300",
-            };
+            const colors = CATEGORY_COLORS[article.category] || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300";
 
             return (
               <Link
@@ -123,7 +118,7 @@ export default function AdvicePage() {
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors.bg} ${colors.text} ${colors.darkBg} ${colors.darkText}`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors}`}
                     >
                       {categoryLabel(article.category)}
                     </span>
