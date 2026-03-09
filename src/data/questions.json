@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Is it normal for blood pressure to spike during exercise?",
+    "body": "I've been checking my blood pressure before and after workouts. Before: 120/80. After 30 minutes of cardio: 160/90. My doctor said my resting BP is fine. Should I be concerned about these spikes during exercise?",
+    "category": "heart-health",
+    "authorName": "RunnerMike42",
+    "views": 3241,
+    "answered": true,
+    "id": "q-1",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "title": "What's the difference between a panic attack and a heart attack?",
+    "body": "I've been having episodes of chest tightness, shortness of breath, and racing heart. My ECG came back normal. How can I tell if what I'm experiencing is anxiety-related or cardiac? The symptoms seem identical to me.",
+    "category": "heart-health",
+    "authorName": "AnxiousAnne",
+    "views": 8921,
+    "answered": true,
+    "id": "q-2",
+    "createdAt": "2025-01-08T00:00:00.000Z"
+  },
+  {
+    "title": "How long does it take for sleep deprivation to cause serious health problems?",
+    "body": "I've been sleeping about 5 hours a night for the past 2 years due to work. I feel okay most of the time. At what point does this become dangerous? Are the effects reversible?",
+    "category": "sleep",
+    "authorName": "LateNightCoder",
+    "views": 5612,
+    "answered": true,
+    "id": "q-3",
+    "createdAt": "2025-01-15T00:00:00.000Z"
+  },
+  {
+    "title": "Can you build muscle while eating a plant-based diet?",
+    "body": "I've been vegan for 6 months and started lifting weights 3 months ago. My progress has stalled compared to when I was eating meat. Am I getting enough protein from plants? What do I need to change?",
+    "category": "nutrition",
+    "authorName": "VeganGains",
+    "views": 4189,
+    "answered": false,
+    "id": "q-4",
+    "createdAt": "2025-01-22T00:00:00.000Z"
+  },
+  {
+    "title": "Is metformin safe to take long-term for type 2 diabetes?",
+    "body": "I was diagnosed with type 2 diabetes last year and put on metformin. My doctor says it's safe but I've been reading about vitamin B12 depletion and other concerns. What should I know about long-term metformin use?",
+    "category": "diabetes",
+    "authorName": "DiabetesNewbie",
+    "views": 7834,
+    "answered": true,
+    "id": "q-5",
+    "createdAt": "2025-01-29T00:00:00.000Z"
+  }
+]

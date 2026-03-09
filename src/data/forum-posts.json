@@ -1,0 +1,46 @@
+[
+  {
+    "title": "What's everyone's experience with intermittent fasting for weight loss?",
+    "body": "I've been doing 16:8 IF for 3 months and lost 18 pounds. But I've hit a plateau. Would love to hear what has worked (or hasn't worked) for others. Have you found any specific eating windows or fasting protocols more effective?",
+    "category": "nutrition",
+    "authorName": "HealthySteve",
+    "views": 2841,
+    "replyCount": 0,
+    "pinned": false,
+    "id": "fp-1",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "title": "Managing anxiety without medication — share your strategies",
+    "body": "I've been dealing with generalized anxiety for 5 years. I've tried therapy (helpful) and medication (too many side effects). Looking for non-pharmaceutical strategies that have actually made a difference for people. Exercise? Breathing techniques? Supplements? What's worked for you?",
+    "category": "mental-health",
+    "authorName": "QuietMindSeeker",
+    "views": 5129,
+    "replyCount": 0,
+    "pinned": true,
+    "id": "fp-2",
+    "createdAt": "2025-01-06T00:00:00.000Z"
+  },
+  {
+    "title": "Running with knee pain — when to push through vs. rest?",
+    "body": "I'm training for my first half marathon and started getting pain on the outside of my left knee about 10 days ago. It's dull during runs but gets sharper near the end. Sounds like IT band syndrome to me. Has anyone dealt with this? Should I keep training or take a full break?",
+    "category": "fitness",
+    "authorName": "FirstTimeRunner",
+    "views": 1893,
+    "replyCount": 0,
+    "pinned": false,
+    "id": "fp-3",
+    "createdAt": "2025-01-11T00:00:00.000Z"
+  },
+  {
+    "title": "Blood sugar spikes after 'healthy' foods — my experience",
+    "body": "As a diabetic I've been using a CGM (continuous glucose monitor) and the results are surprising. Brown rice spikes me more than white rice. Whole wheat bread is just as bad as white. Oatmeal sends me to 180+. Meanwhile, full-fat Greek yogurt barely moves the needle. Anyone else found that official 'healthy' advice doesn't match their personal glucose response?",
+    "category": "diabetes",
+    "authorName": "CGMUser",
+    "views": 7234,
+    "replyCount": 0,
+    "pinned": false,
+    "id": "fp-4",
+    "createdAt": "2025-01-16T00:00:00.000Z"
+  }
+]

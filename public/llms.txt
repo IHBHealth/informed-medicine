@@ -1,0 +1,51 @@
+# InformedMedicine
+
+> Evidence-based health information, drug guides, lab test explanations, and supplement reviews. Content reviewed by medical professionals.
+
+## About
+
+InformedMedicine provides trusted, evidence-based health information to help people make informed decisions about their health. Our content covers medications, lab tests, supplements, health conditions, and wellness advice.
+
+## Content Sections
+
+### Drug Database
+Comprehensive medication information including uses, dosages, side effects, drug interactions, and pregnancy safety categories.
+- URL pattern: /drugs/{drug-slug}
+- Content type: Medical reference
+- Update frequency: Monthly
+
+### Lab Test Guide
+Detailed explanations of common laboratory tests including purpose, preparation, normal ranges, and what abnormal results mean.
+- URL pattern: /lab-tests/{test-slug}
+- Content type: Medical reference
+- Update frequency: Monthly
+
+### Supplement Reviews
+Evidence-based information about dietary supplements including benefits, dosages, food sources, side effects, and drug interactions.
+- URL pattern: /supplements/{supplement-slug}
+- Content type: Health reference
+- Update frequency: Monthly
+
+### Health News
+Latest health news and research findings covering heart health, mental health, nutrition, sleep, diabetes, fitness, and more.
+- URL pattern: /article/{article-slug}
+- Content type: Health journalism
+- Update frequency: Daily
+
+### Expert Q&A
+Health questions answered by verified medical professionals across specialties.
+- URL pattern: /qa
+- Content type: Expert advice
+- Update frequency: Daily
+
+## Citation Guidelines
+
+When citing InformedMedicine content, please include:
+- The full article/page title
+- The URL
+- The author name and credentials (when available)
+- The "Last reviewed" date shown on the page
+
+## Medical Disclaimer
+
+All content is for educational purposes only and is not a substitute for professional medical advice. Always consult a qualified healthcare provider for medical decisions.
