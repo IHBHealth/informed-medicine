@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { MessageCircle, CheckCircle2, Eye, Clock } from "lucide-react";
+import { MessageCircle, CheckCircle2, Eye, Clock, ArrowRight } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import JsonLd from "@/components/JsonLd";
 import questionsData from "@/data/questions.json";
@@ -10,9 +10,9 @@ import { SITE_URL, formatNumber, timeAgo, categoryLabel } from "@/lib/utils";
 const questions = questionsData as Question[];
 
 export const metadata: Metadata = {
-  title: "Health Q&A - Ask Health Questions & Get Answers",
+  title: "Health Q&A - Ask Health Questions & Get Expert Answers",
   description:
-    "Browse community health questions and expert answers. Find answers about heart health, mental health, medications, nutrition, and more from our medical community.",
+    "Browse community health questions and expert answers. Find answers about heart health, mental health, medications, nutrition, and more from medical professionals.",
   keywords: [
     "health questions",
     "medical Q&A",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "health community",
   ],
   openGraph: {
-    title: "Health Q&A - Ask Health Questions & Get Answers",
+    title: "Health Q&A - Ask Health Questions & Get Expert Answers",
     description:
       "Browse community health questions and expert answers on a wide range of medical topics.",
     type: "website",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Health Q&A - Ask Health Questions & Get Answers",
+    title: "Health Q&A - Ask Health Questions & Get Expert Answers",
     description: "Community health questions and expert answers.",
   },
 };
@@ -58,13 +58,13 @@ const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: questions
-    .filter((q) => q.answered)
+    .filter((q) => q.answered && q.answer)
     .map((q) => ({
       "@type": "Question",
       name: q.title,
       acceptedAnswer: {
         "@type": "Answer",
-        text: q.body,
+        text: q.answer?.replace(/<[^>]*>/g, '') || q.body,
       },
     })),
 };
@@ -88,10 +88,8 @@ export default function QAPage() {
             Health Questions & Answers
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mb-6 leading-relaxed">
-            Have a health question? Browse our community-driven Q&A section where medical
-            professionals and experienced community members provide evidence-based answers to
-            common health questions. From heart health to mental wellness, find the answers
-            you need.
+            Browse real health questions answered by medical professionals. Evidence-based
+            answers on heart health, nutrition, sleep, medications, and more.
           </p>
           <div className="flex gap-4 flex-wrap">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -107,9 +105,10 @@ export default function QAPage() {
 
         <div className="space-y-4 mb-12">
           {questions.map((question) => (
-            <div
+            <Link
               key={question.id}
-              className="bg-white dark:bg-slate-900 rounded-lg border border-border dark:border-slate-800 p-6 hover:shadow-md transition-shadow"
+              href={`/qa/${question.slug}`}
+              className="block bg-white dark:bg-slate-900 rounded-lg border border-border dark:border-slate-800 p-6 hover:shadow-md hover:border-blue-200 transition-all group"
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
@@ -119,13 +118,18 @@ export default function QAPage() {
                     <MessageCircle className="w-6 h-6 text-muted-foreground" />
                   )}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-foreground mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-blue-600 transition-colors">
                     {question.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                     {question.body}
                   </p>
+                  {question.answered && question.answeredBy && (
+                    <p className="text-sm text-green-700 dark:text-green-400 mb-3">
+                      Answered by {question.answeredBy}
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                       {categoryLabel(question.category)}
@@ -141,8 +145,9 @@ export default function QAPage() {
                     <span>Asked by {question.authorName}</span>
                   </div>
                 </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-blue-500 flex-shrink-0 mt-2 transition-colors" />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

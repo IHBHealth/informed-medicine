@@ -76,11 +76,14 @@ export interface Article {
 export interface Question {
   id: string;
   title: string;
+  slug: string;
   body: string;
   category: string;
   authorName: string;
   views: number;
   answered: boolean;
+  answer?: string;
+  answeredBy?: string;
   createdAt: string;
 }
 
