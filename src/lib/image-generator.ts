@@ -1,54 +1,81 @@
 import { put } from "@vercel/blob";
 
+async function generateWithFlux(prompt: string): Promise<string> {
+  const token = process.env.REPLICATE_API_TOKEN;
+  if (!token) {
+    throw new Error("REPLICATE_API_TOKEN not set");
+  }
+
+  const createResponse = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      version: "black-forest-labs/flux-1.1-pro",
+      input: {
+        prompt,
+        aspect_ratio: "16:9",
+        output_format: "png",
+        safety_tolerance: 5,
+      },
+    }),
+  });
+
+  if (!createResponse.ok) {
+    const error = await createResponse.text();
+    throw new Error(`Replicate API error: ${error}`);
+  }
+
+  let result = await createResponse.json();
+
+  // Poll for completion
+  while (result.status !== "succeeded" && result.status !== "failed") {
+    await new Promise((r) => setTimeout(r, 2000));
+    const pollResponse = await fetch(result.urls.get, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    result = await pollResponse.json();
+  }
+
+  if (result.status === "failed") {
+    throw new Error(`Flux generation failed: ${result.error}`);
+  }
+
+  return Array.isArray(result.output) ? result.output[0] : result.output;
+}
+
 export async function generateAndUploadImage(
   imagePrompt: string,
   slug: string,
   imageStyle: string = "medical illustration, clean, professional"
 ): Promise<string | null> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    console.warn("OPENAI_API_KEY not set, skipping image generation");
+  const token = process.env.REPLICATE_API_TOKEN;
+  if (!token) {
+    console.warn("REPLICATE_API_TOKEN not set, skipping image generation");
     return null;
   }
 
   try {
-    // Call DALL-E API
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "dall-e-3",
-        prompt: `${imageStyle}. ${imagePrompt}. No text or labels in the image.`,
-        n: 1,
-        size: "1792x1024",
-        quality: "standard",
-      }),
-    });
+    const fullPrompt = `${imageStyle}. ${imagePrompt}. No text or labels in the image.`;
+    const imageUrl = await generateWithFlux(fullPrompt);
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("DALL-E API error:", error);
-      return null;
+    // Download and upload to Vercel Blob if available
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const imageResponse = await fetch(imageUrl);
+      const imageBlob = await imageResponse.blob();
+
+      const { url } = await put(`articles/${slug}.png`, imageBlob, {
+        access: "public",
+        contentType: "image/png",
+      });
+
+      return url;
     }
 
-    const data = await response.json();
-    const imageUrl = data.data?.[0]?.url;
-
-    if (!imageUrl) return null;
-
-    // Download and upload to Vercel Blob
-    const imageResponse = await fetch(imageUrl);
-    const imageBlob = await imageResponse.blob();
-
-    const { url } = await put(`articles/${slug}.png`, imageBlob, {
-      access: "public",
-      contentType: "image/png",
-    });
-
-    return url;
+    // Fall back to using the Replicate URL directly
+    return imageUrl;
   } catch (error) {
     console.error("Image generation error:", error);
     return null;

@@ -123,7 +123,7 @@ export function estimateCost(tokensUsed: number, model: string, imageGenerated: 
   let totalCost = (tokensUsed / 1_000_000) * costPer1M;
 
   if (imageGenerated) {
-    totalCost += 0.04; // DALL-E 3 standard cost
+    totalCost += 0.01; // Flux 1.1 Pro via Replicate
   }
 
   return totalCost.toFixed(4);

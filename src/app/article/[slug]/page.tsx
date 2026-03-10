@@ -11,6 +11,8 @@ import { SITE_NAME, SITE_URL, categoryLabel, CATEGORY_COLORS, cn, formatDate, fo
 import staticArticles from "@/data/articles.json";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+export const revalidate = 0;
 
 interface Props {
   params: { slug: string };
