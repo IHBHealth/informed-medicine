@@ -10,7 +10,8 @@ import {
   LogOut,
   Pill,
   FileText,
-  Activity
+  Activity,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -67,6 +68,7 @@ export default function AdminLayout({
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/generate', label: 'Generate Article', icon: Sparkles },
     { href: '/admin/topics', label: 'Topics', icon: Pill },
     { href: '/admin/articles', label: 'Articles', icon: FileText },
     { href: '/admin/logs', label: 'Generation Logs', icon: Activity },
