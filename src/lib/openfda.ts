@@ -298,6 +298,39 @@ export function labelToDrugFields(label: OpenFDALabel) {
   };
 }
 
+/** Fetch labels in bulk by paginating through all labels for a letter */
+export async function fetchLabelsBulk(letter: string, skip: number = 0, limit: number = 1000): Promise<{ labels: OpenFDALabel[]; total: number }> {
+  const url = `${OPENFDA_BASE}?search=openfda.generic_name:${letter}*&limit=${Math.min(limit, 1000)}&skip=${skip}${apiKeyParam()}`;
+  try {
+    const data = await fetchJson<{ meta: { results: { total: number } }; results?: OpenFDALabel[] }>(url);
+    return {
+      labels: data.results || [],
+      total: data.meta.results.total,
+    };
+  } catch {
+    return { labels: [], total: 0 };
+  }
+}
+
+/** Extract unique drugs from a batch of labels, grouped by generic name */
+export function extractUniqueDrugsFromLabels(labels: OpenFDALabel[]): Map<string, OpenFDALabel> {
+  const drugMap = new Map<string, OpenFDALabel>();
+
+  for (const label of labels) {
+    const genericNames = label.openfda?.generic_name || [];
+    for (const name of genericNames) {
+      const slug = slugify(name);
+      if (!slug) continue;
+      // Keep the first (most recent) label for each drug
+      if (!drugMap.has(slug)) {
+        drugMap.set(slug, label);
+      }
+    }
+  }
+
+  return drugMap;
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
