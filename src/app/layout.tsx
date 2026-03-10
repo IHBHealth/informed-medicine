@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UserProvider from "@/components/UserProvider";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/utils";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -105,6 +106,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </UserProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
