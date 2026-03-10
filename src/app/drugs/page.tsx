@@ -57,9 +57,16 @@ export default async function DrugsPage({
     isFeatured: boolean;
   }> = [];
   let totalCount = 0;
+  let filteredCount = 0;
   let usingDb = false;
 
   try {
+    // Always get the total database count for the header
+    const totalResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(fdaDrugs);
+    totalCount = Number(totalResult[0]?.count || 0);
+
     const conditions = [];
     if (query) {
       conditions.push(
@@ -83,7 +90,7 @@ export default async function DrugsPage({
       .select({ count: sql<number>`count(*)` })
       .from(fdaDrugs)
       .where(whereClause);
-    totalCount = Number(countResult[0]?.count || 0);
+    filteredCount = Number(countResult[0]?.count || 0);
 
     drugs = await db
       .select({
@@ -122,6 +129,8 @@ export default async function DrugsPage({
       isFeatured: true,
     }));
 
+    totalCount = staticDrugs.length;
+
     let filtered = staticDrugs;
     if (query) {
       const q = query.toLowerCase();
@@ -137,11 +146,11 @@ export default async function DrugsPage({
       );
     }
 
-    totalCount = filtered.length;
+    filteredCount = filtered.length;
     drugs = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   }
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filteredCount / PER_PAGE));
 
   function pageUrl(p: number) {
     const u = new URLSearchParams();
