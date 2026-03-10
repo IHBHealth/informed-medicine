@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Menu, X, Heart, Moon, Sun } from "lucide-react";
+import { Menu, X, Heart, User, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser } from "./UserProvider";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -20,6 +21,7 @@ const NAV_LINKS = [
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, loading: userLoading, logout } = useUser();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur border-b border-border">
@@ -52,6 +54,30 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {!userLoading && (
+              user ? (
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-sm">
+                    <User className="w-3.5 h-3.5" />
+                    <span className="font-medium">{user.name}</span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary hover:bg-accent rounded-lg transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Link>
+              )
+            )}
             <button
               className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -80,6 +106,31 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          <div className="border-t border-border mt-2 pt-2">
+            {user ? (
+              <div className="flex items-center justify-between px-3 py-2">
+                <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <User className="w-4 h-4" />
+                  {user.name}
+                </span>
+                <button
+                  onClick={() => { logout(); setMobileOpen(false); }}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-primary"
+                onClick={() => setMobileOpen(false)}
+              >
+                <LogIn className="w-4 h-4" />
+                Sign In
+              </Link>
+            )}
+          </div>
         </nav>
       )}
     </header>

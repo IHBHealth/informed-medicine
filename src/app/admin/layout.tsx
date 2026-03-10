@@ -11,7 +11,8 @@ import {
   Pill,
   FileText,
   Activity,
-  Sparkles
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -71,6 +72,7 @@ export default function AdminLayout({
     { href: '/admin/generate', label: 'Generate Article', icon: Sparkles },
     { href: '/admin/topics', label: 'Topics', icon: Pill },
     { href: '/admin/articles', label: 'Articles', icon: FileText },
+    { href: '/admin/qa', label: 'Q&A Submissions', icon: MessageCircle },
     { href: '/admin/logs', label: 'Generation Logs', icon: Activity },
     { href: '/admin/settings', label: 'Settings', icon: Settings },
   ];

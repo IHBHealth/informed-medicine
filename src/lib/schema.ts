@@ -99,6 +99,35 @@ export interface CuratedDrugData {
 
 export const fda_drugs = fdaDrugs;
 
+// ── Q&A Submissions ──
+
+export const qaSubmissions = pgTable("qa_submissions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email"),
+  question: text("question").notNull(),
+  details: text("details"),
+  category: text("category").notNull().default("general"),
+  status: text("status").notNull().default("pending"), // pending | answered | rejected
+  answer: text("answer"),
+  answeredBy: text("answered_by"),
+  answeredAt: timestamp("answered_at"),
+  publishedSlug: text("published_slug"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const qa_submissions = qaSubmissions;
+
+// ── Users ──
+
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Type exports
 export type NewsroomTopic = typeof newsroomTopics.$inferSelect;
 export type NewNewsroomTopic = typeof newsroomTopics.$inferInsert;
@@ -108,3 +137,5 @@ export type NewNewsroomArticle = typeof newsroomArticles.$inferInsert;
 export type GenerationLog = typeof newsroomGenerationLog.$inferSelect;
 export type FdaDrug = typeof fdaDrugs.$inferSelect;
 export type NewFdaDrug = typeof fdaDrugs.$inferInsert;
+export type QaSubmission = typeof qaSubmissions.$inferSelect;
+export type User = typeof users.$inferSelect;

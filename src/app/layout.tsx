@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import UserProvider from "@/components/UserProvider";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -97,11 +98,13 @@ export default function RootLayout({
         <OrganizationJsonLd />
       </head>
       <body className={inter.className}>
-        <div className="min-h-screen flex flex-col bg-background text-foreground">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <UserProvider>
+          <div className="min-h-screen flex flex-col bg-background text-foreground">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </UserProvider>
       </body>
     </html>
   );

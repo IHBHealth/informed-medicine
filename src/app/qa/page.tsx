@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MessageCircle, CheckCircle2, Eye, Clock, ArrowRight } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import JsonLd from "@/components/JsonLd";
+import AskQuestionForm from "@/components/AskQuestionForm";
 import questionsData from "@/data/questions.json";
 import type { Question } from "@/lib/types";
 import { SITE_URL, formatNumber, timeAgo, categoryLabel } from "@/lib/utils";
@@ -101,6 +102,10 @@ export default function QAPage() {
               <span>{questions.filter((q) => q.answered).length} answered</span>
             </div>
           </div>
+        </div>
+
+        <div className="mb-8">
+          <AskQuestionForm />
         </div>
 
         <div className="space-y-4 mb-12">
