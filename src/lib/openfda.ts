@@ -69,6 +69,67 @@ export async function fetchDrugCountsByLetter(letter: string): Promise<OpenFDACo
   }
 }
 
+/** Fetch drug counts using a two-letter prefix (e.g., "AB") to get past the 1,000 cap */
+export async function fetchDrugCountsByPrefix(prefix: string): Promise<OpenFDACountResult[]> {
+  const url = `${OPENFDA_BASE}?search=openfda.generic_name:${encodeURIComponent(prefix)}*&count=openfda.generic_name.exact&limit=1000${apiKeyParam()}`;
+  try {
+    const data = await fetchJson<{ results: OpenFDACountResult[] }>(url);
+    return data.results || [];
+  } catch {
+    return [];
+  }
+}
+
+/** Get ALL unique drug names for a letter by using two-letter prefixes when needed */
+export async function fetchAllDrugCountsForLetter(letter: string): Promise<OpenFDACountResult[]> {
+  // First try single letter
+  const singleLetterResults = await fetchDrugCountsByLetter(letter);
+
+  // If we got fewer than 1000, we have them all
+  if (singleLetterResults.length < 1000) {
+    return singleLetterResults;
+  }
+
+  // Hit the 1000 cap — use two-letter prefixes to get everything
+  const allResults = new Map<string, number>();
+  const secondLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+  for (const second of secondLetters) {
+    const prefix = `${letter}${second}`;
+    const results = await fetchDrugCountsByPrefix(prefix);
+    for (const r of results) {
+      // Deduplicate by term name
+      const existing = allResults.get(r.term);
+      if (!existing || r.count > existing) {
+        allResults.set(r.term, r.count);
+      }
+    }
+    // Small delay to avoid rate limiting
+    await sleep(100);
+  }
+
+  // Also search for drugs starting with the letter followed by a number or special char
+  const specialPrefixes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  for (const sp of specialPrefixes) {
+    const prefix = `${letter}${sp}`;
+    try {
+      const results = await fetchDrugCountsByPrefix(prefix);
+      for (const r of results) {
+        const existing = allResults.get(r.term);
+        if (!existing || r.count > existing) {
+          allResults.set(r.term, r.count);
+        }
+      }
+    } catch {
+      // ignore — many combos won't have results
+    }
+  }
+
+  return Array.from(allResults.entries())
+    .map(([term, count]) => ({ term, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 export async function fetchLatestLabel(genericName: string): Promise<OpenFDALabel | null> {
   const encoded = encodeURIComponent(`"${genericName}"`);
   const url = `${OPENFDA_BASE}?search=openfda.generic_name.exact:${encoded}&sort=effective_time:desc&limit=1${apiKeyParam()}`;

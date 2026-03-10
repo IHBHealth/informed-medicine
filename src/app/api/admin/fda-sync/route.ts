@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { fdaDrugs } from '@/lib/schema';
 import type { CuratedDrugData } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
-import { fetchDrugCountsByLetter, fetchLatestLabel, labelToDrugFields, slugify, titleCase, sleep } from '@/lib/openfda';
+import { fetchDrugCountsByLetter, fetchAllDrugCountsForLetter, fetchLatestLabel, labelToDrugFields, slugify, titleCase, sleep } from '@/lib/openfda';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
   const skip = parseInt(searchParams.get('skip') || '0');
   const limit = parseInt(searchParams.get('limit') || '1000');
 
+  const deep = searchParams.has('deep'); // Use two-letter prefix search to get past 1000 cap
+
   if (!/^[A-Z]$/.test(letter)) {
     return NextResponse.json({ error: 'Invalid letter parameter' }, { status: 400 });
   }
@@ -32,8 +34,11 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    // Get all unique generic names starting with this letter (up to 1000 from openFDA count API)
-    const allCounts = await fetchDrugCountsByLetter(letter);
+    // Get all unique generic names starting with this letter
+    // With ?deep, uses two-letter prefixes to get past the 1000 cap
+    const allCounts = deep
+      ? await fetchAllDrugCountsForLetter(letter)
+      : await fetchDrugCountsByLetter(letter);
     drugsFound = allCounts.length;
 
     // Apply skip/limit for pagination
